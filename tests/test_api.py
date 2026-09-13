@@ -99,3 +99,35 @@ def test_basic_auth_when_configured(client, monkeypatch):
     assert client.get("/api/stats").status_code == 401
     assert client.get("/health").status_code == 200
     assert client.get("/api/stats", auth=("u", "p")).status_code == 200
+
+
+def test_renewals_reconcile_is_clean(client, monkeypatch):
+    from atlas.api import routes
+
+    monkeypatch.setattr(routes, "_today", lambda: date(2026, 9, 13))
+    r = client.get("/api/renewals/reconcile", params={"days": 30})
+    assert r.status_code == 200 and r.json()["missing"] == 0
+
+
+def test_policy_expiring_today_can_be_quoted(client, monkeypatch):
+    from atlas.api import routes
+    from atlas.db.pool import conn
+
+    with conn() as c:
+        row = c.execute("select policy_number, expiry_date from policies where status='active' order by expiry_date limit 1").fetchone()
+    monkeypatch.setattr(routes, "_today", lambda: row["expiry_date"])
+    assert client.post(f"/api/policies/{row['policy_number']}/quote").status_code == 200
+
+
+def test_slow_requests_emit_a_performance_event(client, captured_errors, monkeypatch):
+    import time
+
+    from atlas.api import routes
+    from atlas.settings import settings
+
+    monkeypatch.setattr(settings(), "slow_request_ms", 10)
+    real = routes.repo.portfolio_stats
+    monkeypatch.setattr(routes.repo, "portfolio_stats", lambda: (time.sleep(0.03), real())[1])
+    assert client.get("/api/stats").status_code == 200
+    assert captured_errors and captured_errors[0]["kind"] == "performance"
+    assert captured_errors[0]["elapsed_ms"] >= 10

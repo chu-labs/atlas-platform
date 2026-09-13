@@ -30,3 +30,8 @@ def due_for_renewal(policies: list[Policy], today: date, days: int = 30) -> list
 
 def days_until_expiry(policy: Policy, today: date) -> int:
     return (policy.expiry_date - today).days
+
+
+def has_expired(policy: Policy, today: date) -> bool:
+    """A policy is expired the day after its expiry date; on the expiry date itself it is still in force."""
+    return policy.expiry_date < today

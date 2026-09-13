@@ -49,6 +49,28 @@ def list_policies(
     return out
 
 
+@router.get("/renewals/reconcile")
+def reconcile_renewals(days: int = Query(30, ge=1, le=365)):
+    """Control: every active policy expiring within `days` must appear in the renewal run.
+
+    Compares the renewal window used by the API with a direct count. A mismatch is a business-rule
+    violation because policyholders would miss their renewal notice.
+    """
+    today = _today()
+    start, end = renewals.renewal_window(today, days)
+    in_run = {p.policy_number for p in repo.active_policies_expiring_between(start, end)}
+    expected = repo.active_policies_expiring_between(today, today + timedelta(days=days))
+    missing = [p for p in expected if p.policy_number not in in_run]
+    if missing:
+        dates = sorted({str(p.expiry_date) for p in missing})
+        raise BusinessRuleViolation(
+            "renewals.window_mismatch",
+            f"{len(missing)} active policies expiring on {', '.join(dates)} are missing from the {days}-day renewal run",
+            customer_impact=len(missing),
+        )
+    return {"days": days, "window": [str(start), str(end)], "policies": len(in_run), "missing": 0}
+
+
 @router.get("/policies/{policy_number}", response_model=PolicyOut)
 def get_policy(policy_number: str):
     p = repo.get_policy(policy_number)
@@ -71,6 +93,10 @@ def quote_policy(policy_number: str):
         raise HTTPException(404, "policy not found")
     if p.status != "active":
         raise BusinessRuleViolation("quote.inactive_policy", f"{policy_number} is {p.status}; only active policies can be quoted")
+    if renewals.has_expired(p, _today()):
+        raise BusinessRuleViolation(
+            "quote.expired_policy", f"{policy_number} expired on {p.expiry_date}; renewal must be re-underwritten"
+        )
     b = repo.get_building(p.building_id)
     profile = risk.risk_profile(b, repo.claims_for_building(b.id), _today())
     q = rating.quote_renewal(p, b, profile, _now())

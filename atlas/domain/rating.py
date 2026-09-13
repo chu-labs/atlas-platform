@@ -11,6 +11,7 @@ from __future__ import annotations
 from datetime import datetime
 from decimal import Decimal
 
+from .errors import BusinessRuleViolation
 from .models import Building, Policy, Quote, RiskProfile
 from .money import allocate, cents
 
@@ -77,6 +78,13 @@ def quote_renewal(policy: Policy, b: Building, profile: RiskProfile, now: dateti
     premium = max(cents(premium), MINIMUM_PREMIUM)
     lots = max(b.lots, 1)
     per_lot = allocate(premium, lots)
+    if sum(per_lot) != premium:
+        # Reconciliation control: the lot schedule must add up to the invoiced premium to the cent.
+        raise BusinessRuleViolation(
+            "quote.allocation_mismatch",
+            f"per-lot schedule sums to {sum(per_lot)} but premium is {premium} for {lots} lots",
+            customer_impact=lots,
+        )
     return Quote(
         policy_number=policy.policy_number,
         quoted_at=now,

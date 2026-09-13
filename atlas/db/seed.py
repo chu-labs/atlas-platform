@@ -7,7 +7,7 @@ the obviously fictional 9xxxxx range and building names are generated.
 from __future__ import annotations
 
 import random
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
 from ..domain.money import cents
@@ -68,7 +68,7 @@ def reset() -> None:
 
 def seed(buildings: int = 2500, as_of: date | None = None) -> dict:
     rng = random.Random(SEED)
-    as_of = as_of or business_today(datetime.now(timezone.utc), settings().business_tz)
+    as_of = as_of or business_today(datetime.now(UTC), settings().business_tz)
     with conn() as c:
         if c.execute("select count(*) as n from buildings").fetchone()["n"]:
             return {"skipped": "already seeded"}
