@@ -14,6 +14,24 @@ def test_metrics_is_prometheus_text(client):
     assert "atlas_http_requests_total" in r.text
 
 
+def test_policies_due_window_includes_the_boundary_day(client, monkeypatch):
+    from atlas.api import routes
+
+    today = date(2026, 9, 13)
+    monkeypatch.setattr(routes, "_today", lambda: today)
+    r = client.get("/api/policies", params={"due_within_days": 30, "limit": 500})
+    assert r.status_code == 200
+    rows = r.json()
+    assert rows, "seed guarantees policies in the window"
+    expiries = {row["expiry_date"] for row in rows}
+    assert all(today <= date.fromisoformat(e) <= today + timedelta(days=30) for e in expiries)
+    # the seed places policies on every day; the 30th day must be present when it exists in the data
+    all_rows = client.get("/api/policies", params={"limit": 500}).json()
+    boundary = (today + timedelta(days=30)).isoformat()
+    if any(x["expiry_date"] == boundary for x in all_rows):
+        assert boundary in expiries
+
+
 def test_policy_list_carries_building_fields(client):
     row = client.get("/api/policies", params={"limit": 1}).json()[0]
     assert row["building_name"] and row["plan_number"].startswith("SP 9")
@@ -83,7 +101,7 @@ def test_basic_auth_when_configured(client, monkeypatch):
     assert client.get("/api/stats", auth=("u", "p")).status_code == 200
 
 
-def _skip_reconcile(client, monkeypatch):
+def test_renewals_reconcile_is_clean(client, monkeypatch):
     from atlas.api import routes
 
     monkeypatch.setattr(routes, "_today", lambda: date(2026, 9, 13))
