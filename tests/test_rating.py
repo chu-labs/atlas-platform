@@ -28,7 +28,7 @@ def test_premium_is_decimal_cents_and_per_lot_sums_exactly(policy, building):
 
 
 def test_per_lot_split_is_exact_for_awkward_lot_counts(policy, building):
-    for lots in (3, 7, 11, 13):
+    for lots in (3, 7, 11, 13, 97, 113):
         q = _quote(policy, replace(building, lots=lots))
         assert sum(q.per_lot) == q.annual_premium, lots
 
