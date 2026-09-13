@@ -2,7 +2,7 @@ from dataclasses import replace
 from datetime import UTC, date, datetime
 from decimal import Decimal
 
-from atlas.domain.money import LARGE_SCHEDULE
+LARGE_SCHEDULE = 50  # the old float fast-path threshold; kept so the regression tests straddle it
 from atlas.domain.rating import (
     HIGH_RISE_FLOORS,
     HIGH_RISE_LOADING,

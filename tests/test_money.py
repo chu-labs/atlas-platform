@@ -2,7 +2,9 @@ from decimal import Decimal
 
 import pytest
 
-from atlas.domain.money import LARGE_SCHEDULE, allocate, cents
+from atlas.domain.money import allocate, cents
+
+LARGE_SCHEDULE = 50  # the old float fast-path threshold; kept so the regression tests straddle it
 
 
 def test_cents_rounds_half_up():
