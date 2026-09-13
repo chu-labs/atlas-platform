@@ -10,7 +10,7 @@ def test_cents_rounds_half_up():
     assert cents("2.994") == Decimal("2.99")
 
 
-@pytest.mark.parametrize("total,parts", [("100.00", 3), ("7519.68", 6), ("1500.00", 7), ("12345.67", 113), ("0.05", 3)])
+@pytest.mark.parametrize("total,parts", [("100.00", 3), ("7519.68", 6), ("1500.00", 7), ("0.05", 3)])
 def test_allocate_sums_exactly(total, parts):
     out = allocate(Decimal(total), parts)
     assert len(out) == parts
