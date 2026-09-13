@@ -2,6 +2,7 @@ from dataclasses import replace
 from datetime import UTC, date, datetime
 from decimal import Decimal
 
+from atlas.domain.money import LARGE_SCHEDULE
 from atlas.domain.rating import (
     HIGH_RISE_FLOORS,
     HIGH_RISE_LOADING,
@@ -29,6 +30,15 @@ def test_premium_is_decimal_cents_and_per_lot_sums_exactly(policy, building):
 
 def test_per_lot_split_is_exact_for_awkward_lot_counts(policy, building):
     for lots in (3, 7, 11, 13):
+        q = _quote(policy, replace(building, lots=lots))
+        assert sum(q.per_lot) == q.annual_premium, lots
+
+
+def test_per_lot_split_is_exact_for_large_lot_counts(policy, building):
+    """ATLAS-39: Harbourview Towers (113 lots) got a per-lot schedule that didn't sum
+    to the annual premium once lots crossed the large-schedule threshold. Every lot
+    count at and above the threshold must still reconcile to the cent."""
+    for lots in (LARGE_SCHEDULE, LARGE_SCHEDULE + 1, 113, 500):
         q = _quote(policy, replace(building, lots=lots))
         assert sum(q.per_lot) == q.annual_premium, lots
 
