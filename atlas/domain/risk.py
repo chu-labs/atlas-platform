@@ -23,7 +23,7 @@ def claims_pillar(b: Building, claims: list[Claim], as_of: date) -> tuple[int, l
     recent = [c for c in claims if (as_of - c.loss_date).days <= 5 * 365 and c.status != "declined"]
     if not recent:
         return 5, []
-    lots = b.lots
+    lots = max(b.lots, 1)
     freq_per_lot_year = len(recent) / lots / 5
     incurred = sum((c.incurred for c in recent), start=0)
     severity = float(incurred) / len(recent)
