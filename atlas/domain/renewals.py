@@ -15,7 +15,11 @@ def business_today(now: datetime, tz: str) -> date:
 
 
 def renewal_window(today: date, days: int) -> tuple[date, date]:
-    """Inclusive [today, today + days] window of expiry dates that are due for renewal."""
+    """Inclusive [today, today + days] window of expiry dates that are due for renewal.
+
+    A policy expiring exactly `days` days from today is in the run. This boundary is documented
+    intent (see CLAUDE.md); the reconcile control depends on it.
+    """
     return today, today + timedelta(days=days)
 
 
