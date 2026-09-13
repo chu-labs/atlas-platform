@@ -1,0 +1,12 @@
+# Local Postgres for development and tests. The API runs on the host: `uv run uvicorn atlas.main:app --reload`.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: atlas
+      POSTGRES_PASSWORD: atlas
+      POSTGRES_DB: atlas
+    ports:
+      - "55433:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
