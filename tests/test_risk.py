@@ -38,3 +38,10 @@ def test_hazards_show_up_as_drivers(building):
 
 def test_bands():
     assert [band(s) for s in (0, 19, 20, 39, 40, 59, 60, 79, 80, 100)] == list("AABBCCDDEE")
+
+
+def test_claims_pillar_handles_zero_lots(building):
+    b = replace(building, lots=0)
+    claims = [make_claim(i, date(2026, 1, 1 + i % 20)) for i in range(3)]
+    p = risk_profile(b, claims, AS_OF)
+    assert 0 <= p.pillars["claims"] <= 100
