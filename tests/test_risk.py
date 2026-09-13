@@ -23,6 +23,13 @@ def test_claims_raise_the_score(building):
     assert risk_profile(building, claims, AS_OF).score > risk_profile(building, [], AS_OF).score
 
 
+def test_building_with_zero_lots_does_not_crash(building):
+    b = replace(building, lots=0)
+    claims = [make_claim(1, date(2026, 3, 1))]
+    p = risk_profile(b, claims, AS_OF)
+    assert 0 <= p.score <= 100
+
+
 def test_declined_claims_are_ignored(building):
     declined = [make_claim(i, date(2026, 2, 1), status="declined") for i in range(10)]
     assert risk_profile(building, declined, AS_OF).pillars["claims"] == risk_profile(building, [], AS_OF).pillars["claims"]
