@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     anthropic_model: str = "claude-sonnet-5"
 
     # Requests slower than this emit a performance error event.
-    slow_request_ms: int = 400
+    slow_request_ms: int = 1000
 
     # Business timezone. Renewal dates are business dates in this zone.
     business_tz: str = "Australia/Sydney"
