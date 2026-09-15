@@ -4,9 +4,11 @@ from datetime import UTC, date, datetime
 from atlas.domain.renewals import business_today, due_for_renewal, is_due, renewal_window
 
 
-def test_window_bounds(policy):
+def test_window_is_inclusive_of_both_ends(policy):
     today = date(2026, 9, 1)
+    assert renewal_window(today, 30) == (date(2026, 9, 1), date(2026, 10, 1))
     assert is_due(replace(policy, expiry_date=date(2026, 9, 1)), today, 30)
+    assert is_due(replace(policy, expiry_date=date(2026, 10, 1)), today, 30), "exactly 30 days out is due"
     assert not is_due(replace(policy, expiry_date=date(2026, 10, 2)), today, 30)
     assert not is_due(replace(policy, expiry_date=date(2026, 8, 31)), today, 30)
 
