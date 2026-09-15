@@ -35,7 +35,7 @@ def test_late_evening_sydney_renewal_is_not_pulled_a_day_early(policy):
     now = datetime(2026, 9, 1, 13, 30, tzinfo=UTC)  # 23:30 AEST
     today = business_today(now, "Australia/Sydney")
     assert today == date(2026, 9, 1)
-    assert is_due(replace(policy, expiry_date=date(2026, 9, 30)), today, 30)
+    assert is_due(replace(policy, expiry_date=date(2026, 10, 1)), today, 30)
 
 
 def test_policy_is_in_force_on_its_expiry_date(policy):
