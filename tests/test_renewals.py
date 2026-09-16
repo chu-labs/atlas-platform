@@ -27,6 +27,15 @@ def test_window_of_zero_days_is_today_only(policy):
     assert not is_due(replace(policy, expiry_date=date(2026, 9, 2)), today, 0)
 
 
+def test_reproduces_atlas_39_60_day_reconcile_incident(policy):
+    # ATLAS-39: reconcile?days=60 on 2026-09-17 (Sydney) 422ed because policies expiring
+    # 2026-11-16 -- exactly 60 days out -- were missing from the run.
+    today = date(2026, 9, 17)
+    assert renewal_window(today, 60) == (date(2026, 9, 17), date(2026, 11, 16))
+    assert is_due(replace(policy, expiry_date=date(2026, 11, 16)), today, 60)
+    assert not is_due(replace(policy, expiry_date=date(2026, 11, 17)), today, 60)
+
+
 def test_inactive_policies_are_never_due(policy):
     assert not is_due(replace(policy, status="lapsed"), date(2026, 9, 20), 30)
 
