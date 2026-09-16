@@ -16,7 +16,9 @@ def migrate() -> list[str]:
     ensure_database()
     applied: list[str] = []
     with psycopg.connect(settings().dsn, autocommit=False) as c:
-        c.execute("create table if not exists schema_migrations (version text primary key, applied_at timestamptz not null default now())")
+        c.execute(
+            "create table if not exists schema_migrations (version text primary key, applied_at timestamptz not null default now())"
+        )
         done = {r[0] for r in c.execute("select version from schema_migrations")}
         for f in sorted(MIGRATIONS.glob("*.sql")):
             if f.name in done:

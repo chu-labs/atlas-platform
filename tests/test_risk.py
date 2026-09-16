@@ -32,7 +32,10 @@ def test_building_with_zero_lots_does_not_crash(building):
 
 def test_declined_claims_are_ignored(building):
     declined = [make_claim(i, date(2026, 2, 1), status="declined") for i in range(10)]
-    assert risk_profile(building, declined, AS_OF).pillars["claims"] == risk_profile(building, [], AS_OF).pillars["claims"]
+    assert (
+        risk_profile(building, declined, AS_OF).pillars["claims"]
+        == risk_profile(building, [], AS_OF).pillars["claims"]
+    )
 
 
 def test_hazards_show_up_as_drivers(building):
