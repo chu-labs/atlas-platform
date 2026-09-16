@@ -1,5 +1,4 @@
 """Money is Decimal, quantised to cents, rounded half-up. Never float."""
-
 from __future__ import annotations
 
 from decimal import ROUND_HALF_UP, Decimal

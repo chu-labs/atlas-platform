@@ -4,7 +4,6 @@ Domain tests need nothing. API tests need Postgres: they create a throwaway data
 named by DB_HOST/DB_PORT/DB_USER/DB_PASSWORD (default: the docker-compose instance on 55433),
 migrate it, seed a small portfolio, and drop it afterwards.
 """
-
 from __future__ import annotations
 
 import os
@@ -29,22 +28,9 @@ from atlas.domain.models import Building, Claim, Policy
 @pytest.fixture
 def building() -> Building:
     return Building(
-        id=1,
-        plan_number="SP 999001",
-        name="Test Towers",
-        suburb="Testville",
-        state="NSW",
-        postcode="2000",
-        year_built=2005,
-        floors=10,
-        lots=40,
-        construction_type="concrete",
-        roof_type="metal",
-        sprinklers=True,
-        flood_zone="none",
-        bushfire_bal="none",
-        distance_to_coast_km=12.0,
-        cladding_flag=False,
+        id=1, plan_number="SP 999001", name="Test Towers", suburb="Testville", state="NSW", postcode="2000",
+        year_built=2005, floors=10, lots=40, construction_type="concrete", roof_type="metal", sprinklers=True,
+        flood_zone="none", bushfire_bal="none", distance_to_coast_km=12.0, cladding_flag=False,
         last_inspection=date(2025, 6, 1),
     )
 
@@ -52,34 +38,16 @@ def building() -> Building:
 @pytest.fixture
 def policy() -> Policy:
     return Policy(
-        id=1,
-        policy_number="ATL-1",
-        building_id=1,
-        broker_id=1,
-        product="residential_strata",
-        inception_date=date(2025, 10, 1),
-        expiry_date=date(2026, 10, 1),
-        sum_insured=Decimal("20000000.00"),
-        base_premium=Decimal("47000.00"),
-        status="active",
+        id=1, policy_number="ATL-1", building_id=1, broker_id=1, product="residential_strata",
+        inception_date=date(2025, 10, 1), expiry_date=date(2026, 10, 1), sum_insured=Decimal("20000000.00"),
+        base_premium=Decimal("47000.00"), status="active",
     )
 
 
-def make_claim(
-    i: int, loss: date, peril: str = "water_damage", incurred: str = "5000", status: str = "closed"
-) -> Claim:
+def make_claim(i: int, loss: date, peril: str = "water_damage", incurred: str = "5000", status: str = "closed") -> Claim:
     return Claim(
-        id=i,
-        claim_number=f"CLM-{i}",
-        policy_id=1,
-        building_id=1,
-        loss_date=loss,
-        reported_date=loss,
-        peril=peril,
-        status=status,
-        incurred=Decimal(incurred),
-        paid=Decimal(incurred),
-        description="test",
+        id=i, claim_number=f"CLM-{i}", policy_id=1, building_id=1, loss_date=loss, reported_date=loss,
+        peril=peril, status=status, incurred=Decimal(incurred), paid=Decimal(incurred), description="test",
     )
 
 
