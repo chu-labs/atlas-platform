@@ -1,4 +1,5 @@
 """ASGI entry point: `uvicorn atlas.main:app`."""
+
 from __future__ import annotations
 
 import logging
@@ -46,7 +47,12 @@ def health():
             c.execute("select 1")
     except Exception:  # noqa: BLE001
         db_ok = False
-    return {"status": "ok" if db_ok else "degraded", "service": settings().service_name, "version": __version__, "db": db_ok}
+    return {
+        "status": "ok" if db_ok else "degraded",
+        "service": settings().service_name,
+        "version": __version__,
+        "db": db_ok,
+    }
 
 
 @app.get("/metrics", response_class=PlainTextResponse)
