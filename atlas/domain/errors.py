@@ -1,5 +1,4 @@
 """Business-rule violations are first-class errors: they are logged and shipped like crashes."""
-
 from __future__ import annotations
 
 

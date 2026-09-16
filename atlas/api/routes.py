@@ -1,5 +1,4 @@
 """HTTP routes. Thin: parse, call repositories and domain functions, shape the response."""
-
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
@@ -25,9 +24,7 @@ def _today():
 
 @router.get("/policies", response_model=list[PolicyOut])
 def list_policies(
-    due_within_days: int | None = Query(
-        None, ge=0, le=365, description="Only policies due for renewal in this window"
-    ),
+    due_within_days: int | None = Query(None, ge=0, le=365, description="Only policies due for renewal in this window"),
     limit: int = Query(100, ge=1, le=500),
 ):
     today = _today()
@@ -95,13 +92,10 @@ def quote_policy(policy_number: str):
     if not p:
         raise HTTPException(404, "policy not found")
     if p.status != "active":
-        raise BusinessRuleViolation(
-            "quote.inactive_policy", f"{policy_number} is {p.status}; only active policies can be quoted"
-        )
+        raise BusinessRuleViolation("quote.inactive_policy", f"{policy_number} is {p.status}; only active policies can be quoted")
     if renewals.has_expired(p, _today()):
         raise BusinessRuleViolation(
-            "quote.expired_policy",
-            f"{policy_number} expired on {p.expiry_date}; renewal must be re-underwritten",
+            "quote.expired_policy", f"{policy_number} expired on {p.expiry_date}; renewal must be re-underwritten"
         )
     b = repo.get_building(p.building_id)
     profile = risk.risk_profile(b, repo.claims_for_building(b.id), _today())

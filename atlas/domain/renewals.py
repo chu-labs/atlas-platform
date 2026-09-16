@@ -1,5 +1,4 @@
 """Renewal window logic. Dates are business dates in the business timezone."""
-
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta
@@ -30,9 +29,7 @@ def is_due(policy: Policy, today: date, days: int = 30) -> bool:
 
 
 def due_for_renewal(policies: list[Policy], today: date, days: int = 30) -> list[Policy]:
-    return sorted(
-        (p for p in policies if is_due(p, today, days)), key=lambda p: (p.expiry_date, p.policy_number)
-    )
+    return sorted((p for p in policies if is_due(p, today, days)), key=lambda p: (p.expiry_date, p.policy_number))
 
 
 def days_until_expiry(policy: Policy, today: date) -> int:
