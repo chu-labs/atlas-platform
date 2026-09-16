@@ -1,5 +1,4 @@
 """python -m atlas.db migrate | seed [--buildings N] | reset"""
-
 from __future__ import annotations
 
 import sys
