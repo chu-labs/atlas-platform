@@ -1,4 +1,5 @@
 """Tiny in-process counters exposed in Prometheus text format at /metrics."""
+
 from __future__ import annotations
 
 from collections import Counter
