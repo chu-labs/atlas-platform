@@ -13,6 +13,20 @@ def test_window_is_inclusive_of_both_ends(policy):
     assert not is_due(replace(policy, expiry_date=date(2026, 8, 31)), today, 30)
 
 
+def test_window_covers_the_60_day_run(policy):
+    today = date(2026, 9, 1)
+    assert renewal_window(today, 60) == (date(2026, 9, 1), date(2026, 10, 31))
+    assert is_due(replace(policy, expiry_date=date(2026, 10, 31)), today, 60), "exactly 60 days out is due"
+    assert not is_due(replace(policy, expiry_date=date(2026, 11, 1)), today, 60)
+
+
+def test_window_of_zero_days_is_today_only(policy):
+    today = date(2026, 9, 1)
+    assert renewal_window(today, 0) == (date(2026, 9, 1), date(2026, 9, 1))
+    assert is_due(replace(policy, expiry_date=date(2026, 9, 1)), today, 0)
+    assert not is_due(replace(policy, expiry_date=date(2026, 9, 2)), today, 0)
+
+
 def test_inactive_policies_are_never_due(policy):
     assert not is_due(replace(policy, status="lapsed"), date(2026, 9, 20), 30)
 
