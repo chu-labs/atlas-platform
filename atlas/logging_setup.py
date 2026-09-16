@@ -1,5 +1,4 @@
 """Structured JSON logging. One line per event, always parseable."""
-
 from __future__ import annotations
 
 import logging

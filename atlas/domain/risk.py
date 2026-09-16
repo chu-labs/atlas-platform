@@ -4,7 +4,6 @@ Pillars and weights:
   claims experience 35%, building fabric 20%, water 15%, natural hazard 20%, compliance 10%.
 Each pillar scores 0..100; the weighted sum is the score. Bands: A <20, B <40, C <60, D <80, E.
 """
-
 from __future__ import annotations
 
 from datetime import date
