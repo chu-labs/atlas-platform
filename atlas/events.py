@@ -2,6 +2,7 @@
 
 Both are best-effort. A failure to emit never fails the request; it is logged instead.
 """
+
 from __future__ import annotations
 
 import json
@@ -73,7 +74,14 @@ def emit_error(ev: dict) -> None:
     if bus:
         try:
             _events().put_events(
-                Entries=[{"Source": "atlas.platform", "DetailType": "error.raised", "EventBusName": bus, "Detail": json.dumps(ev, default=str)}]
+                Entries=[
+                    {
+                        "Source": "atlas.platform",
+                        "DetailType": "error.raised",
+                        "EventBusName": bus,
+                        "Detail": json.dumps(ev, default=str),
+                    }
+                ]
             )
         except Exception:
             log.exception("failed to put error event")
