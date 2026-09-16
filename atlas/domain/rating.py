@@ -6,6 +6,7 @@ minimum premium, then split cent-exactly across lots. All money is Decimal.
 The high-rise loading (floors > 20) is a deliberate business rule: tall buildings carry more
 liability and water exposure. Changing it is an underwriting decision, not a code fix.
 """
+
 from __future__ import annotations
 
 from datetime import datetime
