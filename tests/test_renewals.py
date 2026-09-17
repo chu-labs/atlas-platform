@@ -24,6 +24,12 @@ def test_window_end_is_today_plus_days_for_other_sizes(policy, days):
     assert not is_due(replace(policy, expiry_date=expected_end + timedelta(days=1)), today, days)
 
 
+def test_window_crosses_a_leap_day(policy):
+    today = date(2028, 2, 28)  # 2028 is a leap year
+    assert renewal_window(today, 1) == (date(2028, 2, 28), date(2028, 2, 29))
+    assert is_due(replace(policy, expiry_date=date(2028, 2, 29)), today, 1)
+
+
 def test_inactive_policies_are_never_due(policy):
     assert not is_due(replace(policy, status="lapsed"), date(2026, 9, 20), 30)
 
