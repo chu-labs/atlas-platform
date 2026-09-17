@@ -1,4 +1,5 @@
 """Turn every unhandled exception and every business-rule violation into a structured error event."""
+
 from __future__ import annotations
 
 import logging
@@ -55,7 +56,11 @@ def _handle(request: Request, exc: BaseException) -> JSONResponse:
         kind=kind,
         customer_impact=impact,
         status_code=status,
-        extra={"path": str(request.url.path), "query": str(request.url.query), "path_params": dict(request.path_params)},
+        extra={
+            "path": str(request.url.path),
+            "query": str(request.url.query),
+            "path_params": dict(request.path_params),
+        },
     )
     emit_error(ev)
     metrics.observe(request.url.path, status)
@@ -70,7 +75,9 @@ class SlowRequest(Exception):
 def _slow(request: Request, elapsed_ms: float) -> None:
     rid = getattr(request.state, "request_id", "unknown")
     endpoint = request.scope.get("route").path if request.scope.get("route") else request.url.path
-    exc = SlowRequest(f"{request.method} {endpoint} took {elapsed_ms:.0f} ms (threshold {settings().slow_request_ms} ms)")
+    exc = SlowRequest(
+        f"{request.method} {endpoint} took {elapsed_ms:.0f} ms (threshold {settings().slow_request_ms} ms)"
+    )
     ev = error_event(
         request_id=rid,
         endpoint=endpoint,
@@ -79,7 +86,11 @@ def _slow(request: Request, elapsed_ms: float) -> None:
         kind="performance",
         customer_impact=_impact(request),
         status_code=200,
-        extra={"path": str(request.url.path), "query": str(request.url.query), "elapsed_ms": round(elapsed_ms)},
+        extra={
+            "path": str(request.url.path),
+            "query": str(request.url.query),
+            "elapsed_ms": round(elapsed_ms),
+        },
     )
     ev["stack"] = ""  # nothing raised; the signature and timing are the evidence
     emit_error(ev)
