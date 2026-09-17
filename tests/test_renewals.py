@@ -30,6 +30,14 @@ def test_window_crosses_a_leap_day(policy):
     assert is_due(replace(policy, expiry_date=date(2028, 2, 29)), today, 1)
 
 
+def test_atlas_38_14_day_run_includes_policies_expiring_exactly_14_days_out(policy):
+    """Literal reproduction of ATLAS-38: 6 active policies expiring 2026-10-01 were missing
+    from the 14-day run because renewal_window(2026-09-17, 14) stopped one day short."""
+    today = date(2026, 9, 17)
+    assert renewal_window(today, 14) == (date(2026, 9, 17), date(2026, 10, 1))
+    assert is_due(replace(policy, expiry_date=date(2026, 10, 1)), today, 14)
+
+
 def test_inactive_policies_are_never_due(policy):
     assert not is_due(replace(policy, status="lapsed"), date(2026, 9, 20), 30)
 
