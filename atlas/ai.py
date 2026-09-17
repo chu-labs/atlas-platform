@@ -3,6 +3,7 @@
 Each report gathers structured facts from the repositories, asks the model for prose, and stores
 the result. Reports are cached per subject until `refresh=True`.
 """
+
 from __future__ import annotations
 
 import json
@@ -43,7 +44,9 @@ def _ask(kind: str, subject_key: str, prompt: str, refresh: bool) -> dict:
         messages=[{"role": "user", "content": prompt}],
     )
     content = "".join(b.text for b in msg.content if getattr(b, "type", "") == "text")
-    rid = repo.save_ai_report(kind, subject_key, msg.model, content, msg.usage.input_tokens, msg.usage.output_tokens)
+    rid = repo.save_ai_report(
+        kind, subject_key, msg.model, content, msg.usage.input_tokens, msg.usage.output_tokens
+    )
     return repo.latest_ai_report(kind, subject_key) | {"id": rid}
 
 
