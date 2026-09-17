@@ -1,5 +1,4 @@
 """Repositories: SQL in, domain records out. Keep queries here and only here."""
-
 from __future__ import annotations
 
 from datetime import date
@@ -37,13 +36,10 @@ def list_buildings(state: str | None = None, limit: int = 50, offset: int = 0) -
     with conn() as c:
         if state:
             rows = c.execute(
-                "select * from buildings where state = %s order by id limit %s offset %s",
-                (state, limit, offset),
+                "select * from buildings where state = %s order by id limit %s offset %s", (state, limit, offset)
             ).fetchall()
         else:
-            rows = c.execute(
-                "select * from buildings order by id limit %s offset %s", (limit, offset)
-            ).fetchall()
+            rows = c.execute("select * from buildings order by id limit %s offset %s", (limit, offset)).fetchall()
     return [_building(r) for r in rows]
 
 
@@ -55,9 +51,7 @@ def get_policy(policy_number: str) -> Policy | None:
 
 def policies_for_building(building_id: int) -> list[Policy]:
     with conn() as c:
-        rows = c.execute(
-            "select * from policies where building_id = %s order by expiry_date", (building_id,)
-        ).fetchall()
+        rows = c.execute("select * from policies where building_id = %s order by expiry_date", (building_id,)).fetchall()
     return [_policy(r) for r in rows]
 
 
@@ -91,9 +85,7 @@ def claims_for_building(building_id: int) -> list[Claim]:
 
 def claims_for_policy(policy_id: int) -> list[Claim]:
     with conn() as c:
-        rows = c.execute(
-            "select * from claims where policy_id = %s order by loss_date desc", (policy_id,)
-        ).fetchall()
+        rows = c.execute("select * from claims where policy_id = %s order by loss_date desc", (policy_id,)).fetchall()
     return [_claim(r) for r in rows]
 
 
@@ -136,9 +128,7 @@ def portfolio_stats() -> dict:
     return {**row, "by_state": by_state, "perils": perils}
 
 
-def save_ai_report(
-    kind: str, subject_key: str, model: str, content: str, input_tokens: int, output_tokens: int
-) -> int:
+def save_ai_report(kind: str, subject_key: str, model: str, content: str, input_tokens: int, output_tokens: int) -> int:
     with conn() as c:
         r = c.execute(
             "insert into ai_reports(kind, subject_key, model, content, input_tokens, output_tokens) "
