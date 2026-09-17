@@ -1,5 +1,4 @@
 """Runtime configuration. Everything comes from the environment; nothing is hardcoded."""
-
 from __future__ import annotations
 
 from functools import lru_cache
