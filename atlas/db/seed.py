@@ -4,6 +4,7 @@ Shapes are modelled on an Australian strata book (state mix, lot counts, sums in
 rates, peril mix, claims frequency and severity) but every record is invented. Plan numbers use
 the obviously fictional 9xxxxx range and building names are generated.
 """
+
 from __future__ import annotations
 
 import random
@@ -17,31 +18,170 @@ from .pool import conn
 
 SEED = 42
 
-STATES = [("NSW", 0.38), ("VIC", 0.25), ("QLD", 0.20), ("WA", 0.08), ("SA", 0.05), ("ACT", 0.02), ("TAS", 0.01), ("NT", 0.01)]
+STATES = [
+    ("NSW", 0.38),
+    ("VIC", 0.25),
+    ("QLD", 0.20),
+    ("WA", 0.08),
+    ("SA", 0.05),
+    ("ACT", 0.02),
+    ("TAS", 0.01),
+    ("NT", 0.01),
+]
 SUBURBS = {
-    "NSW": [("Parramatta", "2150"), ("Chatswood", "2067"), ("Wollongong", "2500"), ("Newcastle", "2300"), ("Bondi", "2026"), ("Penrith", "2750"), ("Ryde", "2112"), ("Hurstville", "2220"), ("Manly", "2095"), ("Liverpool", "2170")],
-    "VIC": [("Docklands", "3008"), ("St Kilda", "3182"), ("Geelong", "3220"), ("Box Hill", "3128"), ("Footscray", "3011"), ("Frankston", "3199"), ("Richmond", "3121"), ("Dandenong", "3175")],
-    "QLD": [("Surfers Paradise", "4217"), ("South Brisbane", "4101"), ("Cairns", "4870"), ("Townsville", "4810"), ("Maroochydore", "4558"), ("Chermside", "4032"), ("Broadbeach", "4218")],
-    "WA": [("Scarborough", "6019"), ("Fremantle", "6160"), ("Joondalup", "6027"), ("East Perth", "6004"), ("Mandurah", "6210")],
+    "NSW": [
+        ("Parramatta", "2150"),
+        ("Chatswood", "2067"),
+        ("Wollongong", "2500"),
+        ("Newcastle", "2300"),
+        ("Bondi", "2026"),
+        ("Penrith", "2750"),
+        ("Ryde", "2112"),
+        ("Hurstville", "2220"),
+        ("Manly", "2095"),
+        ("Liverpool", "2170"),
+    ],
+    "VIC": [
+        ("Docklands", "3008"),
+        ("St Kilda", "3182"),
+        ("Geelong", "3220"),
+        ("Box Hill", "3128"),
+        ("Footscray", "3011"),
+        ("Frankston", "3199"),
+        ("Richmond", "3121"),
+        ("Dandenong", "3175"),
+    ],
+    "QLD": [
+        ("Surfers Paradise", "4217"),
+        ("South Brisbane", "4101"),
+        ("Cairns", "4870"),
+        ("Townsville", "4810"),
+        ("Maroochydore", "4558"),
+        ("Chermside", "4032"),
+        ("Broadbeach", "4218"),
+    ],
+    "WA": [
+        ("Scarborough", "6019"),
+        ("Fremantle", "6160"),
+        ("Joondalup", "6027"),
+        ("East Perth", "6004"),
+        ("Mandurah", "6210"),
+    ],
     "SA": [("Glenelg", "5045"), ("Adelaide", "5000"), ("Mawson Lakes", "5095"), ("Port Adelaide", "5015")],
     "ACT": [("Belconnen", "2617"), ("Braddon", "2612"), ("Woden", "2606")],
     "TAS": [("Sandy Bay", "7005"), ("Launceston", "7250")],
     "NT": [("Darwin", "0800"), ("Palmerston", "0830")],
 }
-NAMES_A = ["Harbourview", "Parkside", "The Meridian", "Sandstone", "Riverbend", "Aurora", "Banksia", "Wattle", "Coral", "Lighthouse", "Jacaranda", "Seabreeze", "Quarry", "Windsor", "Elm", "Marina", "Summit", "Grange", "Bayside", "Kingsway"]
-NAMES_B = ["Towers", "Apartments", "Residences", "Court", "Terraces", "Gardens", "Place", "Heights", "Quays", "Point", "Lofts", "Square", "Mews", "Rise", "Park"]
-BROKER_A = ["Southern Cross", "Coastline", "Meridian", "Harbour City", "Bluegum", "Redgum", "Sandstone", "Federation", "Anchor", "Pinnacle", "Compass", "Beacon", "Granite", "Keystone", "Northwind", "Silverline", "Cornerstone", "Ironbark", "Lantern", "Summit"]
+NAMES_A = [
+    "Harbourview",
+    "Parkside",
+    "The Meridian",
+    "Sandstone",
+    "Riverbend",
+    "Aurora",
+    "Banksia",
+    "Wattle",
+    "Coral",
+    "Lighthouse",
+    "Jacaranda",
+    "Seabreeze",
+    "Quarry",
+    "Windsor",
+    "Elm",
+    "Marina",
+    "Summit",
+    "Grange",
+    "Bayside",
+    "Kingsway",
+]
+NAMES_B = [
+    "Towers",
+    "Apartments",
+    "Residences",
+    "Court",
+    "Terraces",
+    "Gardens",
+    "Place",
+    "Heights",
+    "Quays",
+    "Point",
+    "Lofts",
+    "Square",
+    "Mews",
+    "Rise",
+    "Park",
+]
+BROKER_A = [
+    "Southern Cross",
+    "Coastline",
+    "Meridian",
+    "Harbour City",
+    "Bluegum",
+    "Redgum",
+    "Sandstone",
+    "Federation",
+    "Anchor",
+    "Pinnacle",
+    "Compass",
+    "Beacon",
+    "Granite",
+    "Keystone",
+    "Northwind",
+    "Silverline",
+    "Cornerstone",
+    "Ironbark",
+    "Lantern",
+    "Summit",
+]
 BROKER_B = ["Insurance Brokers", "Risk Partners", "Strata Brokers", "Broking Group", "Underwriting Agencies"]
-PERILS = [("water_damage", 0.45), ("storm", 0.25), ("impact", 0.08), ("fire", 0.05), ("liability", 0.04), ("theft", 0.03), ("malicious", 0.03), ("other", 0.07)]
+PERILS = [
+    ("water_damage", 0.45),
+    ("storm", 0.25),
+    ("impact", 0.08),
+    ("fire", 0.05),
+    ("liability", 0.04),
+    ("theft", 0.03),
+    ("malicious", 0.03),
+    ("other", 0.07),
+]
 DESCRIPTIONS = {
-    "water_damage": ["Burst flexi hose in lot {n} bathroom, damage to lot below", "Shower waterproofing failure, lots {n} and {m}", "Roof membrane leak into top floor lot {n}", "Hot water unit failure in common area plant room", "Blocked stormwater riser, ground floor lobby flooded"],
-    "storm": ["Storm damage to roof sheeting and guttering", "Hail damage to skylights and car park roof", "Wind-driven rain ingress via balcony doors, lot {n}", "Fallen tree damaged perimeter fence and carport"],
-    "impact": ["Vehicle impact to basement car park bollards and wall", "Delivery truck struck awning at entry", "Impact damage to boom gate"],
-    "fire": ["Kitchen fire in lot {n}, smoke damage to corridor", "Electrical fire in switchboard, common area", "BBQ fire on balcony, lot {n}"],
-    "liability": ["Slip and fall on wet lobby tiles, visitor injured", "Trip on uneven paving in common driveway"],
+    "water_damage": [
+        "Burst flexi hose in lot {n} bathroom, damage to lot below",
+        "Shower waterproofing failure, lots {n} and {m}",
+        "Roof membrane leak into top floor lot {n}",
+        "Hot water unit failure in common area plant room",
+        "Blocked stormwater riser, ground floor lobby flooded",
+    ],
+    "storm": [
+        "Storm damage to roof sheeting and guttering",
+        "Hail damage to skylights and car park roof",
+        "Wind-driven rain ingress via balcony doors, lot {n}",
+        "Fallen tree damaged perimeter fence and carport",
+    ],
+    "impact": [
+        "Vehicle impact to basement car park bollards and wall",
+        "Delivery truck struck awning at entry",
+        "Impact damage to boom gate",
+    ],
+    "fire": [
+        "Kitchen fire in lot {n}, smoke damage to corridor",
+        "Electrical fire in switchboard, common area",
+        "BBQ fire on balcony, lot {n}",
+    ],
+    "liability": [
+        "Slip and fall on wet lobby tiles, visitor injured",
+        "Trip on uneven paving in common driveway",
+    ],
     "theft": ["Break-in to basement storage cages", "Theft of copper from plant room"],
-    "malicious": ["Graffiti and glass damage to ground floor entry", "Vandalism to lift car and lobby mirror"],
-    "other": ["Lift breakdown, mechanical failure", "Glass breakage to balcony balustrade, lot {n}", "Electrical surge damaged fire panel"],
+    "malicious": [
+        "Graffiti and glass damage to ground floor entry",
+        "Vandalism to lift car and lobby mirror",
+    ],
+    "other": [
+        "Lift breakdown, mechanical failure",
+        "Glass breakage to balcony balustrade, lot {n}",
+        "Electrical surge damaged fire panel",
+    ],
 }
 
 
@@ -63,7 +203,9 @@ def _lognormal(rng: random.Random, median: float, sigma: float, lo: float, hi: f
 
 def reset() -> None:
     with conn() as c:
-        c.execute("truncate ai_reports, renewal_quotes, claims, policies, buildings, brokers restart identity cascade")
+        c.execute(
+            "truncate ai_reports, renewal_quotes, claims, policies, buildings, brokers restart identity cascade"
+        )
 
 
 def seed(buildings: int = 2500, as_of: date | None = None) -> dict:
@@ -79,7 +221,9 @@ def seed(buildings: int = 2500, as_of: date | None = None) -> dict:
             state = _pick(rng, STATES)
             brokers.append((f"{rng.choice(BROKER_A)} {rng.choice(BROKER_B)} ({state})", state))
         cur = c.cursor()
-        cur.executemany("insert into brokers(name, state) values (%s, %s) returning id", brokers, returning=True)
+        cur.executemany(
+            "insert into brokers(name, state) values (%s, %s) returning id", brokers, returning=True
+        )
         broker_ids = []
         while True:
             broker_ids.append(cur.fetchone()["id"])
@@ -101,13 +245,40 @@ def seed(buildings: int = 2500, as_of: date | None = None) -> dict:
             roof = _pick(rng, [("tile", 0.35), ("metal", 0.35), ("concrete", 0.2), ("membrane", 0.1)])
             coast = _lognormal(rng, 6, 1.2, 0.1, 400)
             flood = _pick(rng, [("none", 0.82), ("low", 0.13), ("high", 0.05)])
-            bal = _pick(rng, [("none", 0.80), ("low", 0.10), ("12.5", 0.05), ("19", 0.025), ("29", 0.015), ("40", 0.007), ("FZ", 0.003)])
+            bal = _pick(
+                rng,
+                [
+                    ("none", 0.80),
+                    ("low", 0.10),
+                    ("12.5", 0.05),
+                    ("19", 0.025),
+                    ("29", 0.015),
+                    ("40", 0.007),
+                    ("FZ", 0.003),
+                ],
+            )
             cladding = year >= 2000 and floors >= 4 and rng.random() < 0.06
             inspection = as_of - timedelta(days=int(rng.uniform(30, 2200))) if rng.random() < 0.9 else None
             name = f"{rng.choice(NAMES_A)} {rng.choice(NAMES_B)}"
             b_rows.append(
-                (f"SP 9{i + 10000:05d}", name, suburb, state, postcode, year, floors, lots, ctype, roof, floors > 3 and rng.random() < 0.6,
-                 flood, bal, round(coast, 1), cladding, inspection)
+                (
+                    f"SP 9{i + 10000:05d}",
+                    name,
+                    suburb,
+                    state,
+                    postcode,
+                    year,
+                    floors,
+                    lots,
+                    ctype,
+                    roof,
+                    floors > 3 and rng.random() < 0.6,
+                    flood,
+                    bal,
+                    round(coast, 1),
+                    cladding,
+                    inspection,
+                )
             )
         cur.executemany(
             "insert into buildings(plan_number,name,suburb,state,postcode,year_built,floors,lots,construction_type,roof_type,"
@@ -122,7 +293,9 @@ def seed(buildings: int = 2500, as_of: date | None = None) -> dict:
         pn = 100000
         for b in blds:
             product = "commercial_strata" if rng.random() < 0.12 else "residential_strata"
-            per_lot = _lognormal(rng, 520_000 if product == "residential_strata" else 700_000, 0.45, 180_000, 3_000_000)
+            per_lot = _lognormal(
+                rng, 520_000 if product == "residential_strata" else 700_000, 0.45, 180_000, 3_000_000
+            )
             si = cents(Decimal(int(per_lot * b["lots"] / 1000) * 1000))
             rate = Decimal(str(round(rng.uniform(0.0019, 0.0034), 6)))
             premium = max(cents(si * rate), Decimal("1500.00"))
@@ -132,18 +305,44 @@ def seed(buildings: int = 2500, as_of: date | None = None) -> dict:
             if status == "lapsed" and rng.random() < 0.7:
                 expiry = as_of + timedelta(days=int(rng.uniform(1, 365)))
                 status = "active"
-            p_rows.append((f"ATL-{pn}", b["id"], broker, product, expiry - timedelta(days=365), expiry, si, premium, status))
+            p_rows.append(
+                (
+                    f"ATL-{pn}",
+                    b["id"],
+                    broker,
+                    product,
+                    expiry - timedelta(days=365),
+                    expiry,
+                    si,
+                    premium,
+                    status,
+                )
+            )
             pn += 1
             for k in range(rng.choice([0, 0, 1, 2, 3])):
                 e = expiry - timedelta(days=365 * (k + 1))
-                p_rows.append((f"ATL-{pn}", b["id"], broker, product, e - timedelta(days=365), e, si, cents(premium * Decimal(str(round(rng.uniform(0.85, 0.97), 3)))), "lapsed"))
+                p_rows.append(
+                    (
+                        f"ATL-{pn}",
+                        b["id"],
+                        broker,
+                        product,
+                        e - timedelta(days=365),
+                        e,
+                        si,
+                        cents(premium * Decimal(str(round(rng.uniform(0.85, 0.97), 3)))),
+                        "lapsed",
+                    )
+                )
                 pn += 1
         cur.executemany(
             "insert into policies(policy_number,building_id,broker_id,product,inception_date,expiry_date,sum_insured,base_premium,status) "
             "values (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
             p_rows,
         )
-        pols = c.execute("select id, building_id, inception_date, expiry_date from policies order by id").fetchall()
+        pols = c.execute(
+            "select id, building_id, inception_date, expiry_date from policies order by id"
+        ).fetchall()
         pol_by_building: dict[int, list] = {}
         for p in pols:
             pol_by_building.setdefault(p["building_id"], []).append(p)
@@ -158,18 +357,57 @@ def seed(buildings: int = 2500, as_of: date | None = None) -> dict:
             for _ in range(n):
                 loss = as_of - timedelta(days=int(rng.uniform(1, 6 * 365)))
                 peril = _pick(rng, PERILS)
-                median = {"water_damage": 6000, "storm": 9000, "impact": 7000, "fire": 45000, "liability": 20000, "theft": 3500, "malicious": 2500, "other": 5000}[peril]
+                median = {
+                    "water_damage": 6000,
+                    "storm": 9000,
+                    "impact": 7000,
+                    "fire": 45000,
+                    "liability": 20000,
+                    "theft": 3500,
+                    "malicious": 2500,
+                    "other": 5000,
+                }[peril]
                 incurred = cents(Decimal(int(_lognormal(rng, median, 1.0, 400, 900_000))))
-                status = "open" if (as_of - loss).days < 120 and rng.random() < 0.6 else ("declined" if rng.random() < 0.06 else "closed")
-                paid = Decimal("0.00") if status != "closed" else cents(incurred * Decimal(str(round(rng.uniform(0.85, 1.0), 3))))
-                cands = [p for p in pol_by_building[b["id"]] if p["inception_date"] <= loss <= p["expiry_date"]] or pol_by_building[b["id"]]
+                status = (
+                    "open"
+                    if (as_of - loss).days < 120 and rng.random() < 0.6
+                    else ("declined" if rng.random() < 0.06 else "closed")
+                )
+                paid = (
+                    Decimal("0.00")
+                    if status != "closed"
+                    else cents(incurred * Decimal(str(round(rng.uniform(0.85, 1.0), 3))))
+                )
+                cands = [
+                    p for p in pol_by_building[b["id"]] if p["inception_date"] <= loss <= p["expiry_date"]
+                ] or pol_by_building[b["id"]]
                 pol = rng.choice(cands)
-                desc = rng.choice(DESCRIPTIONS[peril]).format(n=rng.randint(1, b["lots"]), m=rng.randint(1, b["lots"]))
-                c_rows.append((f"CLM-{cn}", pol["id"], b["id"], loss, loss + timedelta(days=int(rng.uniform(0, 21))), peril, status, incurred, paid, desc))
+                desc = rng.choice(DESCRIPTIONS[peril]).format(
+                    n=rng.randint(1, b["lots"]), m=rng.randint(1, b["lots"])
+                )
+                c_rows.append(
+                    (
+                        f"CLM-{cn}",
+                        pol["id"],
+                        b["id"],
+                        loss,
+                        loss + timedelta(days=int(rng.uniform(0, 21))),
+                        peril,
+                        status,
+                        incurred,
+                        paid,
+                        desc,
+                    )
+                )
                 cn += 1
         cur.executemany(
             "insert into claims(claim_number,policy_id,building_id,loss_date,reported_date,peril,status,incurred,paid,description) "
             "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
             c_rows,
         )
-        return {"brokers": len(brokers), "buildings": len(b_rows), "policies": len(p_rows), "claims": len(c_rows)}
+        return {
+            "brokers": len(brokers),
+            "buildings": len(b_rows),
+            "policies": len(p_rows),
+            "claims": len(c_rows),
+        }
