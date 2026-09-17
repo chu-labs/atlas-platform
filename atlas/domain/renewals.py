@@ -20,7 +20,7 @@ def renewal_window(today: date, days: int) -> tuple[date, date]:
     A policy expiring exactly `days` days from today is in the run. This boundary is documented
     intent (see CLAUDE.md); the reconcile control depends on it.
     """
-    return today, today + timedelta(days=days - 1)
+    return today, today + timedelta(days=days)
 
 
 def is_due(policy: Policy, today: date, days: int = 30) -> bool:
