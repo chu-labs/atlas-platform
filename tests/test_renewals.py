@@ -1,5 +1,7 @@
 from dataclasses import replace
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
+
+import pytest
 
 from atlas.domain.renewals import business_today, due_for_renewal, is_due, renewal_window
 
@@ -11,6 +13,15 @@ def test_window_is_inclusive_of_both_ends(policy):
     assert is_due(replace(policy, expiry_date=date(2026, 10, 1)), today, 30), "exactly 30 days out is due"
     assert not is_due(replace(policy, expiry_date=date(2026, 10, 2)), today, 30)
     assert not is_due(replace(policy, expiry_date=date(2026, 8, 31)), today, 30)
+
+
+@pytest.mark.parametrize("days", [0, 7, 14, 90])
+def test_window_end_is_today_plus_days_for_other_sizes(policy, days):
+    today = date(2026, 9, 1)
+    expected_end = today + timedelta(days=days)
+    assert renewal_window(today, days) == (today, expected_end)
+    assert is_due(replace(policy, expiry_date=expected_end), today, days), f"exactly {days} days out is due"
+    assert not is_due(replace(policy, expiry_date=expected_end + timedelta(days=1)), today, days)
 
 
 def test_inactive_policies_are_never_due(policy):
