@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date
 
 
 def test_health(client):
@@ -40,7 +40,9 @@ def test_quote_on_lapsed_policy_is_a_business_rule_violation(client, captured_er
     from atlas.db.pool import conn
 
     with conn() as c:
-        pn = c.execute("select policy_number from policies where status='lapsed' limit 1").fetchone()["policy_number"]
+        pn = c.execute("select policy_number from policies where status='lapsed' limit 1").fetchone()[
+            "policy_number"
+        ]
     r = client.post(f"/api/policies/{pn}/quote")
     assert r.status_code == 422
     assert r.json()["rule"] == "quote.inactive_policy"
@@ -96,7 +98,9 @@ def test_policy_expiring_today_can_be_quoted(client, monkeypatch):
     from atlas.db.pool import conn
 
     with conn() as c:
-        row = c.execute("select policy_number, expiry_date from policies where status='active' order by expiry_date limit 1").fetchone()
+        row = c.execute(
+            "select policy_number, expiry_date from policies where status='active' order by expiry_date limit 1"
+        ).fetchone()
     monkeypatch.setattr(routes, "_today", lambda: row["expiry_date"])
     assert client.post(f"/api/policies/{row['policy_number']}/quote").status_code == 200
 

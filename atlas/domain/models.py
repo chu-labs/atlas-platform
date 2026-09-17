@@ -1,4 +1,5 @@
 """Domain records. Plain dataclasses so repositories and tests can build them without a database."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
