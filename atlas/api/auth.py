@@ -1,5 +1,4 @@
 """Shared basic-auth credential for the whole lab. /health and /metrics stay open for the ALB."""
-
 from __future__ import annotations
 
 import base64
@@ -24,13 +23,9 @@ class BasicAuthMiddleware(BaseHTTPMiddleware):
         if header.startswith("Basic "):
             try:
                 user, _, pw = base64.b64decode(header[6:]).decode().partition(":")
-                ok = secrets.compare_digest(user, s.basic_auth_user) and secrets.compare_digest(
-                    pw, s.basic_auth_pass
-                )
+                ok = secrets.compare_digest(user, s.basic_auth_user) and secrets.compare_digest(pw, s.basic_auth_pass)
             except Exception:  # noqa: BLE001
                 ok = False
         if not ok:
-            return Response(
-                "unauthorised", status_code=401, headers={"WWW-Authenticate": 'Basic realm="atlas"'}
-            )
+            return Response("unauthorised", status_code=401, headers={"WWW-Authenticate": 'Basic realm="atlas"'})
         return await call_next(request)
